@@ -45,6 +45,7 @@ next-env.d.ts
 
 # machine-local Claude Code settings
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # vendored AI-assistant skill docs (auto-installed by `prisma init`, regenerable)
 .agents/

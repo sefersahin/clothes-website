@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { generateUniqueSlug } from "@/lib/slugify";
+import { shapeImage } from "@/lib/productImage";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -18,7 +19,13 @@ export async function GET() {
     include: { variants: true, images: { orderBy: { sortOrder: "asc" } } },
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(products);
+
+  const shaped = products.map((product) => ({
+    ...product,
+    images: product.images.map(shapeImage),
+  }));
+
+  return NextResponse.json(shaped);
 }
 
 export async function POST(request: Request) {
