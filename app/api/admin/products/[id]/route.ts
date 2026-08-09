@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { cloudinary } from "@/lib/cloudinary";
 
 const patchSchema = z
   .object({
@@ -58,9 +59,15 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const existing = await prisma.product.findUnique({ where: { id } });
+  const existing = await prisma.product.findUnique({
+    where: { id },
+    include: { images: true },
+  });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  await Promise.all(
+    existing.images.map((image) => cloudinary.uploader.destroy(image.publicId)),
+  );
   await prisma.product.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }
