@@ -13,17 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mağaza",
-  description: "Online mağazamızdan ürünleri keşfedin.",
+  title: {
+    default: "Hilay Butik",
+    template: "%s · Hilay Butik",
+  },
+  description: "Hilay Butik online mağazasından ürünleri keşfedin.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="tr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">{children}</body>
     </html>
   );
 }

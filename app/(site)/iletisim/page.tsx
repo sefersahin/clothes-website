@@ -33,55 +33,55 @@ export default function ContactPage() {
 
   if (status === "sent") {
     return (
-      <div className="max-w-lg">
-        <h1 className="mb-4 text-2xl font-semibold">İletişim</h1>
-        <p className="text-sm text-gray-700">Mesajınız alındı, teşekkür ederiz.</p>
+      <div className="mx-auto max-w-lg text-center">
+        <h1 className="mb-4 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
+        <p className="text-sm text-stone-600">Mesajınız alındı, teşekkür ederiz.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-semibold">İletişim</h1>
+    <div className="mx-auto max-w-lg">
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm text-gray-700">Ad Soyad</label>
+          <label className="mb-1 block text-sm text-stone-700">Ad Soyad</label>
           <input
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-gray-700">Telefon</label>
+          <label className="mb-1 block text-sm text-stone-700">Telefon</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-gray-700">E-posta</label>
+          <label className="mb-1 block text-sm text-stone-700">E-posta</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-gray-700">Mesajınız</label>
+          <label className="mb-1 block text-sm text-stone-700">Mesajınız</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
             rows={5}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
           />
         </div>
 
@@ -92,7 +92,7 @@ export default function ContactPage() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-rose-600 disabled:opacity-50"
         >
           {status === "sending" ? "Gönderiliyor…" : "Gönder"}
         </button>

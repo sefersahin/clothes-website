@@ -2,13 +2,15 @@ import { faqs } from "@/lib/faq";
 
 export default function FaqPage() {
   return (
-    <div className="max-w-2xl">
-      <h1 className="mb-6 text-2xl font-semibold">Sıkça Sorulan Sorular</h1>
-      <div className="space-y-6">
+    <div className="mx-auto max-w-2xl">
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight text-stone-900">
+        Sıkça Sorulan Sorular
+      </h1>
+      <div className="divide-y divide-stone-200">
         {faqs.map((faq) => (
-          <div key={faq.question}>
-            <h2 className="mb-1 text-sm font-semibold">{faq.question}</h2>
-            <p className="text-sm text-gray-700">{faq.answer}</p>
+          <div key={faq.question} className="py-5">
+            <h2 className="mb-1 text-sm font-semibold text-stone-900">{faq.question}</h2>
+            <p className="text-sm leading-relaxed text-stone-600">{faq.answer}</p>
           </div>
         ))}
       </div>
