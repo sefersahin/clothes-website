@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clothes-website-dev",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "C:\\Claude Projects\\ClothesWebsite\\dev.cmd"],
+      "port": 3000
+    }
+  ]
+}
