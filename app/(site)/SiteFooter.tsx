@@ -37,7 +37,7 @@ export default function SiteFooter() {
         <div>
           <div className="mb-2 text-sm font-semibold text-stone-900">Ödeme &amp; Kargo</div>
           <p className="text-sm text-stone-500">
-            Kredi kartı ve banka havalesi/EFT ile ödeme, DHL ile kargo.
+            Kredi kartı ve banka havalesi/EFT ile ödeme, Hızlı kargo.
           </p>
         </div>
       </div>

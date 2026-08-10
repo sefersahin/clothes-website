@@ -5,7 +5,7 @@ import { shapeImage } from "@/lib/productImage";
 export async function GET() {
   const products = await prisma.product.findMany({
     where: { status: "active" },
-    include: { variants: true, images: { orderBy: { sortOrder: "asc" } } },
+    include: { variants: true, images: { orderBy: { sortOrder: "asc" } }, category: true },
     orderBy: { createdAt: "desc" },
   });
 

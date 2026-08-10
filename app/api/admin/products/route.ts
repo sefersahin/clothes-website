@@ -9,6 +9,7 @@ const createSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   basePrice: z.number().positive(),
+  categoryId: z.string().min(1).nullable().optional(),
 });
 
 export async function GET() {
@@ -16,7 +17,11 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const products = await prisma.product.findMany({
-    include: { variants: true, images: { orderBy: { sortOrder: "asc" } } },
+    include: {
+      variants: true,
+      images: { orderBy: { sortOrder: "asc" } },
+      category: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -38,11 +43,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { name, description, basePrice } = parsed.data;
+  const { name, description, basePrice, categoryId } = parsed.data;
   const slug = await generateUniqueSlug(name);
 
   const product = await prisma.product.create({
-    data: { name, description, basePrice, slug },
+    data: { name, description, basePrice, slug, categoryId },
   });
 
   return NextResponse.json(product, { status: 201 });

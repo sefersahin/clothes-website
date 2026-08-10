@@ -11,6 +11,7 @@ const patchSchema = z
     description: z.string().min(1).optional(),
     basePrice: z.number().positive().optional(),
     status: z.enum(["draft", "active", "archived"]).optional(),
+    categoryId: z.string().min(1).nullable().optional(),
     salePercent: z.number().min(0).max(100).optional(),
     salePrice: z.number().positive().nullable().optional(),
   })
@@ -32,9 +33,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const { name, description, basePrice, status, salePercent, salePrice } = parsed.data;
+  const { name, description, basePrice, status, categoryId, salePercent, salePrice } = parsed.data;
 
-  const data: Prisma.ProductUpdateInput = { name, description, basePrice, status };
+  const data: Prisma.ProductUncheckedUpdateInput = {
+    name,
+    description,
+    basePrice,
+    status,
+    categoryId,
+  };
 
   const effectiveBasePrice = basePrice ?? Number(existing.basePrice);
 

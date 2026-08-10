@@ -1,38 +1,8 @@
 import { NextResponse } from "next/server";
-import type { UploadApiResponse } from "cloudinary";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { cloudinary } from "@/lib/cloudinary";
 import { shapeImage } from "@/lib/productImage";
-
-const MAX_FILE_BYTES = 15 * 1024 * 1024;
-const ALLOWED_MIME_TYPES = new Set([
-  "image/heic",
-  "image/heif",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
-const ALLOWED_EXTENSIONS = new Set(["heic", "heif", "jpg", "jpeg", "png", "webp"]);
-
-function isAllowedImage(file: File) {
-  if (ALLOWED_MIME_TYPES.has(file.type)) return true;
-  const ext = file.name.split(".").pop()?.toLowerCase();
-  return Boolean(ext && ALLOWED_EXTENSIONS.has(ext));
-}
-
-function uploadToCloudinary(buffer: Buffer): Promise<UploadApiResponse> {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: "products", format: "jpg" },
-      (error, result) => {
-        if (error || !result) return reject(error ?? new Error("Upload failed"));
-        resolve(result);
-      },
-    );
-    stream.end(buffer);
-  });
-}
+import { MAX_IMAGE_BYTES, isAllowedImage, uploadImageToCloudinary } from "@/lib/imageUpload";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdmin();
@@ -53,7 +23,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });
   }
-  if (file.size > MAX_FILE_BYTES) {
+  if (file.size > MAX_IMAGE_BYTES) {
     return NextResponse.json({ error: "File too large (max 15MB)" }, { status: 400 });
   }
   if (!isAllowedImage(file)) {
@@ -61,7 +31,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const uploadResult = await uploadToCloudinary(buffer);
+  const uploadResult = await uploadImageToCloudinary(buffer, "products");
 
   const maxSortOrder = await prisma.productImage.aggregate({
     where: { productId: id },

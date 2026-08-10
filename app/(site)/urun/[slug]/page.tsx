@@ -15,6 +15,7 @@ export default async function ProductDetailPage({
     include: {
       variants: true,
       images: { orderBy: { sortOrder: "asc" } },
+      sizeChartRows: { orderBy: { sortOrder: "asc" } },
     },
   });
 
@@ -71,7 +72,7 @@ export default async function ProductDetailPage({
         </p>
 
         {product.variants.length > 0 && (
-          <div>
+          <div className="mb-8">
             <h2 className="mb-3 text-sm font-semibold text-stone-900">Beden / Renk</h2>
             <table className="w-full text-left text-sm">
               <thead>
@@ -93,6 +94,34 @@ export default async function ProductDetailPage({
                         <span className="text-stone-400">Stokta Yok</span>
                       )}
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {product.sizeChartRows.length > 0 && (
+          <div>
+            <h2 className="mb-3 text-sm font-semibold text-stone-900">Beden Tablosu</h2>
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-stone-200 text-stone-500">
+                  <th className="py-2 pr-4 font-medium">Beden</th>
+                  <th className="py-2 pr-4 font-medium">Göğüs (cm)</th>
+                  <th className="py-2 pr-4 font-medium">Bel (cm)</th>
+                  <th className="py-2 pr-4 font-medium">Kalça (cm)</th>
+                  <th className="py-2 pr-4 font-medium">Boy (cm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {product.sizeChartRows.map((row) => (
+                  <tr key={row.id} className="border-b border-stone-100">
+                    <td className="py-2 pr-4">{row.size}</td>
+                    <td className="py-2 pr-4">{row.chest ?? "—"}</td>
+                    <td className="py-2 pr-4">{row.waist ?? "—"}</td>
+                    <td className="py-2 pr-4">{row.hip ?? "—"}</td>
+                    <td className="py-2 pr-4">{row.length ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>

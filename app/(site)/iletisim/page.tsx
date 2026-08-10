@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 
+// Edit this text to change the message shown under the "İletişim" heading.
+const CONTACT_INTRO_MESSAGE =
+  "Sorularınız, siparişleriniz veya işbirlikleri için bize aşağıdaki formdan ulaşabilirsiniz.";
+
 export default function ContactPage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -42,7 +46,8 @@ export default function ContactPage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
+      <h1 className="mb-3 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
+      <p className="mb-8 text-sm leading-relaxed text-stone-600">{CONTACT_INTRO_MESSAGE}</p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="mb-1 block text-sm text-stone-700">Ad Soyad</label>

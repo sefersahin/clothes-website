@@ -32,3 +32,12 @@ export async function generateUniqueSlug(name: string): Promise<string> {
   const suffix = randomBytes(3).toString("hex");
   return `${slug}-${suffix}`;
 }
+
+export async function generateUniqueCategorySlug(name: string): Promise<string> {
+  const slug = baseSlug(name) || "kategori";
+  const existing = await prisma.category.findUnique({ where: { slug } });
+  if (!existing) return slug;
+
+  const suffix = randomBytes(3).toString("hex");
+  return `${slug}-${suffix}`;
+}

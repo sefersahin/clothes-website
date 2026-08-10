@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { shapeImage } from "@/lib/productImage";
 import ProductDetailsForm from "./ProductDetailsForm";
 import VariantManager from "./VariantManager";
+import SizeChartManager from "./SizeChartManager";
 import ImageManager from "./ImageManager";
 import DeleteProductButton from "./DeleteProductButton";
 
@@ -13,13 +14,17 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
 
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      variants: true,
-      images: { orderBy: { sortOrder: "asc" } },
-    },
-  });
+  const [product, categories] = await Promise.all([
+    prisma.product.findUnique({
+      where: { id },
+      include: {
+        variants: true,
+        images: { orderBy: { sortOrder: "asc" } },
+        sizeChartRows: { orderBy: { sortOrder: "asc" } },
+      },
+    }),
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   if (!product) notFound();
 
@@ -38,10 +43,14 @@ export default async function EditProductPage({
           basePrice: product.basePrice.toString(),
           salePrice: product.salePrice ? product.salePrice.toString() : null,
           status: product.status,
+          categoryId: product.categoryId,
         }}
+        categories={categories}
       />
 
       <VariantManager productId={product.id} variants={product.variants} />
+
+      <SizeChartManager productId={product.id} rows={product.sizeChartRows} />
 
       <ImageManager productId={product.id} images={product.images.map(shapeImage)} />
     </div>

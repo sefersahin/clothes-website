@@ -7,6 +7,14 @@ export default function AboutPage() {
         sürdürüyor. Kaliteli ürünleri uygun fiyatlarla sunmaya devam ediyoruz. Sorularınız için
         iletişim sayfamızdan bize ulaşabilirsiniz.
       </p>
+      <a
+        href="https://instagram.com/hilaybutikk"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-rose-600 hover:text-rose-700"
+      >
+        @hilaybutikk üzerinden Instagram&apos;da takip edin →
+      </a>
     </div>
   );
 }

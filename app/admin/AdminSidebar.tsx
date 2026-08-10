@@ -4,6 +4,8 @@ import LogoutButton from "./LogoutButton";
 const links = [
   { href: "/admin", label: "Ana Sayfa" },
   { href: "/admin/products", label: "Ürünler" },
+  { href: "/admin/categories", label: "Kategoriler" },
+  { href: "/admin/homepage", label: "Vitrin" },
   { href: "/admin/orders", label: "Siparişler" },
 ];
 

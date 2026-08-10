@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type Category = { id: string; name: string };
+
 type Product = {
   id: string;
   name: string;
@@ -10,6 +12,7 @@ type Product = {
   basePrice: string;
   salePrice: string | null;
   status: string;
+  categoryId: string | null;
 };
 
 const statusOptions = [
@@ -18,12 +21,19 @@ const statusOptions = [
   { value: "archived", label: "Arşivlendi" },
 ];
 
-export default function ProductDetailsForm({ product }: { product: Product }) {
+export default function ProductDetailsForm({
+  product,
+  categories,
+}: {
+  product: Product;
+  categories: Category[];
+}) {
   const router = useRouter();
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
   const [basePrice, setBasePrice] = useState(product.basePrice);
   const [status, setStatus] = useState(product.status);
+  const [categoryId, setCategoryId] = useState(product.categoryId ?? "");
   const [salePercent, setSalePercent] = useState("");
   const [salePrice, setSalePrice] = useState(product.salePrice ?? "");
   const [saleMode, setSaleMode] = useState<"percent" | "price">("price");
@@ -40,6 +50,7 @@ export default function ProductDetailsForm({ product }: { product: Product }) {
       description,
       basePrice: Number(basePrice),
       status,
+      categoryId: categoryId || null,
     };
 
     const res = await fetch(`/api/admin/products/${product.id}`, {
@@ -146,6 +157,22 @@ export default function ProductDetailsForm({ product }: { product: Product }) {
               ))}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm text-gray-700">Kategori</label>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="">Kategori Yok</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button
