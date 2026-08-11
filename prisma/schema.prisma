@@ -30,6 +30,14 @@ enum PaymentStatus {
   refunded
 }
 
+enum SizeChartType {
+  dress
+  shirt
+  skirt
+  suit
+  pants
+}
+
 model Product {
   id          String        @id @default(cuid())
   slug        String        @unique
@@ -64,10 +72,12 @@ model ProductGroup {
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  sizeChartType SizeChartType @default(dress)
+  isAllProducts Boolean       @default(false)
+  createdAt     DateTime      @default(now())
 
   products   Product[]
   heroSlides HeroSlide[]
@@ -124,6 +134,7 @@ model SizeChartRow {
   id        String  @id @default(cuid())
   productId String
   size      String
+  neck      String?
   chest     String?
   waist     String?
   hip       String?
@@ -150,6 +161,7 @@ model ProductImage {
 model Order {
   id            String        @id @default(cuid())
   orderToken    String        @unique
+  customerId    String?
   customerName  String
   phone         String
   email         String?
@@ -163,7 +175,8 @@ model Order {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  items OrderItem[]
+  customer Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items    OrderItem[]
 
   @@map("orders")
 }
@@ -189,4 +202,31 @@ model Session {
   createdAt DateTime @default(now())
 
   @@map("sessions")
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions CustomerSession[]
+  orders   Order[]
+
+  @@map("customers")
+}
+
+model CustomerSession {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  customerId String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_sessions")
 }

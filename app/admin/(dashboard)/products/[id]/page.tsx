@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { shapeImage } from "@/lib/productImage";
+import { DEFAULT_SIZE_CHART_TYPE } from "@/lib/sizeChart";
 import ProductDetailsForm from "./ProductDetailsForm";
 import VariantManager from "./VariantManager";
 import SizeChartManager from "./SizeChartManager";
@@ -23,6 +24,7 @@ export default async function EditProductPage({
         images: { orderBy: { sortOrder: "asc" } },
         sizeChartRows: { orderBy: { sortOrder: "asc" } },
         group: { include: { products: true } },
+        category: true,
       },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
@@ -57,7 +59,11 @@ export default async function EditProductPage({
 
       <ColorVariantManager productId={product.id} siblings={siblings} />
 
-      <SizeChartManager productId={product.id} rows={product.sizeChartRows} />
+      <SizeChartManager
+        productId={product.id}
+        rows={product.sizeChartRows}
+        sizeChartType={product.category?.sizeChartType ?? DEFAULT_SIZE_CHART_TYPE}
+      />
 
       <ImageManager productId={product.id} images={product.images.map(shapeImage)} />
     </div>

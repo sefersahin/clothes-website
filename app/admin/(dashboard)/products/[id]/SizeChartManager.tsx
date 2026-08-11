@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SIZE_CHART_FIELDS, type SizeChartFieldKey, type SizeChartType } from "@/lib/sizeChart";
 
 type SizeChartRow = {
   id: string;
   size: string;
+  neck: string | null;
   chest: string | null;
   waist: string | null;
   hip: string | null;
@@ -15,18 +17,19 @@ type SizeChartRow = {
 export default function SizeChartManager({
   productId,
   rows,
+  sizeChartType,
 }: {
   productId: string;
   rows: SizeChartRow[];
+  sizeChartType: SizeChartType;
 }) {
   const router = useRouter();
+  const fields = SIZE_CHART_FIELDS[sizeChartType];
+
   const [size, setSize] = useState("");
-  const [chest, setChest] = useState("");
-  const [waist, setWaist] = useState("");
-  const [hip, setHip] = useState("");
-  const [length, setLength] = useState("");
+  const [values, setValues] = useState<Partial<Record<SizeChartFieldKey, string>>>({});
   const [error, setError] = useState<string | null>(null);
-  const [edits, setEdits] = useState<Record<string, Partial<Record<"chest" | "waist" | "hip" | "length", string>>>>({});
+  const [edits, setEdits] = useState<Record<string, Partial<Record<SizeChartFieldKey, string>>>>({});
   const [busy, setBusy] = useState(false);
 
   async function addRow(e: React.FormEvent) {
@@ -34,16 +37,16 @@ export default function SizeChartManager({
     setError(null);
     setBusy(true);
 
+    const body: Record<string, string> = { size };
+    for (const field of fields) {
+      const value = values[field.key];
+      if (value) body[field.key] = value;
+    }
+
     const res = await fetch(`/api/admin/products/${productId}/size-chart-rows`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        size,
-        chest: chest || undefined,
-        waist: waist || undefined,
-        hip: hip || undefined,
-        length: length || undefined,
-      }),
+      body: JSON.stringify(body),
     });
 
     setBusy(false);
@@ -52,21 +55,18 @@ export default function SizeChartManager({
       return;
     }
     setSize("");
-    setChest("");
-    setWaist("");
-    setHip("");
-    setLength("");
+    setValues({});
     router.refresh();
   }
 
   async function saveRow(rowId: string) {
-    const values = edits[rowId];
-    if (!values) return;
+    const rowValues = edits[rowId];
+    if (!rowValues) return;
     setBusy(true);
     await fetch(`/api/admin/size-chart-rows/${rowId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify(rowValues),
     });
     setBusy(false);
     router.refresh();
@@ -79,11 +79,11 @@ export default function SizeChartManager({
     router.refresh();
   }
 
-  function fieldValue(row: SizeChartRow, field: "chest" | "waist" | "hip" | "length") {
+  function fieldValue(row: SizeChartRow, field: SizeChartFieldKey) {
     return edits[row.id]?.[field] ?? row[field] ?? "";
   }
 
-  function updateField(rowId: string, field: "chest" | "waist" | "hip" | "length", value: string) {
+  function updateField(rowId: string, field: SizeChartFieldKey, value: string) {
     setEdits((prev) => ({ ...prev, [rowId]: { ...prev[rowId], [field]: value } }));
   }
 
@@ -92,17 +92,18 @@ export default function SizeChartManager({
       <h2 className="mb-1 text-sm font-medium text-gray-500">Beden Tablosu</h2>
       <p className="mb-3 text-xs text-gray-400">
         Müşterilerin doğru bedeni seçmesine yardımcı olmak için ölçüleri (cm) girin. Ürün
-        sayfasında bu tablo gösterilir.
+        sayfasında bu tablo gösterilir. Gösterilen ölçüler, ürünün kategorisine göre belirlenir.
       </p>
 
       <table className="mb-4 w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-200 text-gray-500">
             <th className="py-2 pr-4">Beden</th>
-            <th className="py-2 pr-4">Göğüs (cm)</th>
-            <th className="py-2 pr-4">Bel (cm)</th>
-            <th className="py-2 pr-4">Kalça (cm)</th>
-            <th className="py-2 pr-4">Boy (cm)</th>
+            {fields.map((field) => (
+              <th key={field.key} className="py-2 pr-4">
+                {field.label}
+              </th>
+            ))}
             <th className="py-2 pr-4" />
           </tr>
         </thead>
@@ -110,12 +111,12 @@ export default function SizeChartManager({
           {rows.map((row) => (
             <tr key={row.id} className="border-b border-gray-100">
               <td className="py-2 pr-4">{row.size}</td>
-              {(["chest", "waist", "hip", "length"] as const).map((field) => (
-                <td key={field} className="py-2 pr-4">
+              {fields.map((field) => (
+                <td key={field.key} className="py-2 pr-4">
                   <input
                     type="text"
-                    value={fieldValue(row, field)}
-                    onChange={(e) => updateField(row.id, field, e.target.value)}
+                    value={fieldValue(row, field.key)}
+                    onChange={(e) => updateField(row.id, field.key, e.target.value)}
                     className="w-20 rounded border border-gray-300 px-2 py-1"
                   />
                 </td>
@@ -142,7 +143,7 @@ export default function SizeChartManager({
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-gray-500">
+              <td colSpan={fields.length + 2} className="py-4 text-gray-500">
                 Henüz beden tablosu satırı eklenmedi.
               </td>
             </tr>
@@ -161,42 +162,17 @@ export default function SizeChartManager({
             className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
           />
         </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Göğüs (cm)</label>
-          <input
-            type="text"
-            value={chest}
-            onChange={(e) => setChest(e.target.value)}
-            className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Bel (cm)</label>
-          <input
-            type="text"
-            value={waist}
-            onChange={(e) => setWaist(e.target.value)}
-            className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Kalça (cm)</label>
-          <input
-            type="text"
-            value={hip}
-            onChange={(e) => setHip(e.target.value)}
-            className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Boy (cm)</label>
-          <input
-            type="text"
-            value={length}
-            onChange={(e) => setLength(e.target.value)}
-            className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </div>
+        {fields.map((field) => (
+          <div key={field.key}>
+            <label className="mb-1 block text-sm text-gray-700">{field.label}</label>
+            <input
+              type="text"
+              value={values[field.key] ?? ""}
+              onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+              className="w-20 rounded border border-gray-300 px-3 py-2 text-sm"
+            />
+          </div>
+        ))}
         <button
           type="submit"
           disabled={busy}

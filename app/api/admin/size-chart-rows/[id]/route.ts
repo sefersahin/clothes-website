@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 
 const patchSchema = z.object({
   size: z.string().min(1).optional(),
+  neck: z.string().min(1).nullable().optional(),
   chest: z.string().min(1).nullable().optional(),
   waist: z.string().min(1).nullable().optional(),
   hip: z.string().min(1).nullable().optional(),

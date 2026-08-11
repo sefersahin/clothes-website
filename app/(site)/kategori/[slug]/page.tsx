@@ -13,7 +13,7 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const products = await prisma.product.findMany({
-    where: { status: "active", categoryId: category.id },
+    where: category.isAllProducts ? { status: "active" } : { status: "active", categoryId: category.id },
     include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
     orderBy: { createdAt: "desc" },
   });

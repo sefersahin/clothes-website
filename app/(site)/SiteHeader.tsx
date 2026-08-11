@@ -2,6 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/logo.png";
 import { prisma } from "@/lib/db";
+import { getCurrentCustomer } from "@/lib/customerAuth";
+import CartButton from "./CartButton";
+import AccountMenu from "./AccountMenu";
 
 const rightNavLinks = [
   { href: "/hakkimizda", label: "Hakkımızda" },
@@ -10,7 +13,10 @@ const rightNavLinks = [
 ];
 
 export default async function SiteHeader() {
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, customer] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getCurrentCustomer(),
+  ]);
 
   return (
     <header className="sticky top-0 z-10 border-b border-stone-200 bg-white/90 backdrop-blur">
@@ -42,6 +48,8 @@ export default async function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          <CartButton />
+          <AccountMenu customer={customer ? { name: customer.name } : null} />
         </nav>
       </div>
     </header>

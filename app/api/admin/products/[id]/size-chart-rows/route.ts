@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 
 const createSchema = z.object({
   size: z.string().min(1),
+  neck: z.string().min(1).optional(),
   chest: z.string().min(1).optional(),
   waist: z.string().min(1).optional(),
   hip: z.string().min(1).optional(),

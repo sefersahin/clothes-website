@@ -2,8 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { shapeImage } from "@/lib/productImage";
+import { DEFAULT_SIZE_CHART_TYPE, SIZE_CHART_FIELDS } from "@/lib/sizeChart";
 import PriceDisplay from "@/components/PriceDisplay";
 import ProductGallery from "@/app/(site)/ProductGallery";
+import AddToCartButton from "./AddToCartButton";
 
 export default async function ProductDetailPage({
   params,
@@ -18,6 +20,7 @@ export default async function ProductDetailPage({
       variants: true,
       images: { orderBy: { sortOrder: "asc" } },
       sizeChartRows: { orderBy: { sortOrder: "asc" } },
+      category: true,
       group: {
         include: {
           products: {
@@ -34,6 +37,7 @@ export default async function ProductDetailPage({
   const images = product.images.map(shapeImage);
   const isSoldOut = product.status === "archived";
   const colorOptions = product.group?.products ?? [];
+  const sizeChartFields = SIZE_CHART_FIELDS[product.category?.sizeChartType ?? DEFAULT_SIZE_CHART_TYPE];
 
   return (
     <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-2">
@@ -91,28 +95,21 @@ export default async function ProductDetailPage({
           </div>
         )}
 
-        {product.variants.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-3 text-sm font-semibold text-stone-900">Beden</h2>
-            <div className="flex flex-wrap gap-2">
-              {product.variants.map((variant) => {
-                const inStock = variant.stockQuantity > 0;
-                return (
-                  <span
-                    key={variant.id}
-                    className={`rounded-lg border px-3 py-1.5 text-sm ${
-                      inStock
-                        ? "border-stone-900 font-semibold text-stone-900"
-                        : "border-stone-200 text-stone-300 line-through"
-                    }`}
-                  >
-                    {variant.size}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <AddToCartButton
+          productId={product.id}
+          slug={product.slug}
+          name={product.name}
+          color={product.color}
+          image={images[0]?.thumbnailUrl ?? null}
+          basePrice={Number(product.basePrice)}
+          salePrice={product.salePrice ? Number(product.salePrice) : null}
+          variants={product.variants.map((v) => ({
+            id: v.id,
+            size: v.size,
+            stockQuantity: v.stockQuantity,
+          }))}
+          disabled={isSoldOut}
+        />
 
         {product.sizeChartRows.length > 0 && (
           <div>
@@ -121,20 +118,22 @@ export default async function ProductDetailPage({
               <thead>
                 <tr className="border-b border-stone-200 text-stone-500">
                   <th className="py-2 pr-4 font-medium">Beden</th>
-                  <th className="py-2 pr-4 font-medium">Göğüs (cm)</th>
-                  <th className="py-2 pr-4 font-medium">Bel (cm)</th>
-                  <th className="py-2 pr-4 font-medium">Kalça (cm)</th>
-                  <th className="py-2 pr-4 font-medium">Boy (cm)</th>
+                  {sizeChartFields.map((field) => (
+                    <th key={field.key} className="py-2 pr-4 font-medium">
+                      {field.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {product.sizeChartRows.map((row) => (
                   <tr key={row.id} className="border-b border-stone-100">
                     <td className="py-2 pr-4">{row.size}</td>
-                    <td className="py-2 pr-4">{row.chest ?? "—"}</td>
-                    <td className="py-2 pr-4">{row.waist ?? "—"}</td>
-                    <td className="py-2 pr-4">{row.hip ?? "—"}</td>
-                    <td className="py-2 pr-4">{row.length ?? "—"}</td>
+                    {sizeChartFields.map((field) => (
+                      <td key={field.key} className="py-2 pr-4">
+                        {row[field.key] ?? "—"}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
