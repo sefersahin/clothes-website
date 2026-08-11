@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { shapeImage } from "@/lib/productImage";
 import PriceDisplay from "@/components/PriceDisplay";
+import ProductGallery from "@/app/(site)/ProductGallery";
 
 export default async function ProductDetailPage({
   params,
@@ -16,6 +18,14 @@ export default async function ProductDetailPage({
       variants: true,
       images: { orderBy: { sortOrder: "asc" } },
       sizeChartRows: { orderBy: { sortOrder: "asc" } },
+      group: {
+        include: {
+          products: {
+            where: { status: { not: "draft" } },
+            include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
+          },
+        },
+      },
     },
   });
 
@@ -23,34 +33,11 @@ export default async function ProductDetailPage({
 
   const images = product.images.map(shapeImage);
   const isSoldOut = product.status === "archived";
+  const colorOptions = product.group?.products ?? [];
 
   return (
-    <div className="grid gap-10 md:grid-cols-2">
-      <div>
-        <div className="mb-3 aspect-[3/4] overflow-hidden rounded-xl bg-stone-100">
-          {images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={images[0].url} alt={product.name} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-stone-400">
-              Görsel yok
-            </div>
-          )}
-        </div>
-        {images.length > 1 && (
-          <div className="grid grid-cols-4 gap-3">
-            {images.slice(1).map((image) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={image.id}
-                src={image.thumbnailUrl}
-                alt=""
-                className="aspect-square rounded-lg object-cover ring-1 ring-stone-200"
-              />
-            ))}
-          </div>
-        )}
-      </div>
+    <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-2">
+      <ProductGallery images={images} productName={product.name} />
 
       <div>
         <h1 className="mb-2 text-2xl font-semibold text-stone-900 sm:text-3xl">{product.name}</h1>
@@ -71,33 +58,59 @@ export default async function ProductDetailPage({
           {product.description}
         </p>
 
+        {colorOptions.length > 1 && (
+          <div className="mb-8">
+            <h2 className="mb-3 text-sm font-semibold text-stone-900">Renk</h2>
+            <div className="flex flex-wrap gap-2">
+              {colorOptions.map((option) => {
+                const cover = option.images[0] ? shapeImage(option.images[0]) : null;
+                const isCurrent = option.id === product.id;
+                return (
+                  <Link
+                    key={option.id}
+                    href={`/urun/${option.slug}`}
+                    className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
+                      isCurrent
+                        ? "border-stone-900 font-medium text-stone-900"
+                        : "border-stone-200 text-stone-600 hover:border-stone-400"
+                    }`}
+                  >
+                    {cover && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={cover.thumbnailUrl}
+                        alt=""
+                        className="h-5 w-5 rounded-full object-cover"
+                      />
+                    )}
+                    {option.color ?? option.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {product.variants.length > 0 && (
           <div className="mb-8">
-            <h2 className="mb-3 text-sm font-semibold text-stone-900">Beden / Renk</h2>
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-stone-200 text-stone-500">
-                  <th className="py-2 pr-4 font-medium">Beden</th>
-                  <th className="py-2 pr-4 font-medium">Renk</th>
-                  <th className="py-2 pr-4 font-medium">Durum</th>
-                </tr>
-              </thead>
-              <tbody>
-                {product.variants.map((variant) => (
-                  <tr key={variant.id} className="border-b border-stone-100">
-                    <td className="py-2 pr-4">{variant.size}</td>
-                    <td className="py-2 pr-4">{variant.color}</td>
-                    <td className="py-2 pr-4">
-                      {variant.stockQuantity > 0 ? (
-                        <span className="text-emerald-600">Stokta</span>
-                      ) : (
-                        <span className="text-stone-400">Stokta Yok</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <h2 className="mb-3 text-sm font-semibold text-stone-900">Beden</h2>
+            <div className="flex flex-wrap gap-2">
+              {product.variants.map((variant) => {
+                const inStock = variant.stockQuantity > 0;
+                return (
+                  <span
+                    key={variant.id}
+                    className={`rounded-lg border px-3 py-1.5 text-sm ${
+                      inStock
+                        ? "border-stone-900 font-semibold text-stone-900"
+                        : "border-stone-200 text-stone-300 line-through"
+                    }`}
+                  >
+                    {variant.size}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         )}
 

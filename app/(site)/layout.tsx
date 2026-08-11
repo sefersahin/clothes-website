@@ -10,7 +10,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
       <MarqueeBar text={marquee.text} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">{children}</main>
+      <main className="flex-1">{children}</main>
       <SiteFooter />
     </div>
   );

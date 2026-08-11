@@ -4,6 +4,7 @@ import { shapeImage } from "@/lib/productImage";
 import ProductDetailsForm from "./ProductDetailsForm";
 import VariantManager from "./VariantManager";
 import SizeChartManager from "./SizeChartManager";
+import ColorVariantManager from "./ColorVariantManager";
 import ImageManager from "./ImageManager";
 import DeleteProductButton from "./DeleteProductButton";
 
@@ -21,12 +22,15 @@ export default async function EditProductPage({
         variants: true,
         images: { orderBy: { sortOrder: "asc" } },
         sizeChartRows: { orderBy: { sortOrder: "asc" } },
+        group: { include: { products: true } },
       },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!product) notFound();
+
+  const siblings = (product.group?.products ?? []).filter((p) => p.id !== product.id);
 
   return (
     <div className="max-w-3xl space-y-10">
@@ -44,11 +48,14 @@ export default async function EditProductPage({
           salePrice: product.salePrice ? product.salePrice.toString() : null,
           status: product.status,
           categoryId: product.categoryId,
+          color: product.color,
         }}
         categories={categories}
       />
 
       <VariantManager productId={product.id} variants={product.variants} />
+
+      <ColorVariantManager productId={product.id} siblings={siblings} />
 
       <SizeChartManager productId={product.id} rows={product.sizeChartRows} />
 

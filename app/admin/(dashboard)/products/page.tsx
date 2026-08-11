@@ -30,6 +30,7 @@ export default async function AdminProductsPage() {
           <thead>
             <tr className="border-b border-gray-200 text-gray-500">
               <th className="py-2 pr-4">Ürün</th>
+              <th className="py-2 pr-4">Renk</th>
               <th className="py-2 pr-4">Durum</th>
               <th className="py-2 pr-4">Fiyat</th>
               <th className="py-2 pr-4">Toplam Stok</th>
@@ -45,6 +46,7 @@ export default async function AdminProductsPage() {
                       {product.name}
                     </Link>
                   </td>
+                  <td className="py-2 pr-4">{product.color ?? "—"}</td>
                   <td className="py-2 pr-4">{statusLabels[product.status] ?? product.status}</td>
                   <td className="py-2 pr-4">
                     {product.salePrice ? `${product.salePrice}₺` : `${product.basePrice}₺`}
@@ -55,7 +57,7 @@ export default async function AdminProductsPage() {
             })}
             {products.length === 0 && (
               <tr>
-                <td colSpan={4} className="py-6 text-center text-gray-500">
+                <td colSpan={5} className="py-6 text-center text-gray-500">
                   Henüz ürün eklenmedi.
                 </td>
               </tr>

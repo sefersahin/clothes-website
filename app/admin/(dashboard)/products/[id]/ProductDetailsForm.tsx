@@ -13,6 +13,7 @@ type Product = {
   salePrice: string | null;
   status: string;
   categoryId: string | null;
+  color: string | null;
 };
 
 const statusOptions = [
@@ -34,6 +35,7 @@ export default function ProductDetailsForm({
   const [basePrice, setBasePrice] = useState(product.basePrice);
   const [status, setStatus] = useState(product.status);
   const [categoryId, setCategoryId] = useState(product.categoryId ?? "");
+  const [color, setColor] = useState(product.color ?? "");
   const [salePercent, setSalePercent] = useState("");
   const [salePrice, setSalePrice] = useState(product.salePrice ?? "");
   const [saleMode, setSaleMode] = useState<"percent" | "price">("price");
@@ -51,6 +53,7 @@ export default function ProductDetailsForm({
       basePrice: Number(basePrice),
       status,
       categoryId: categoryId || null,
+      color: color || null,
     };
 
     const res = await fetch(`/api/admin/products/${product.id}`, {
@@ -159,20 +162,32 @@ export default function ProductDetailsForm({
           </div>
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Kategori</label>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-          >
-            <option value="">Kategori Yok</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="mb-1 block text-sm text-gray-700">Kategori</label>
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">Kategori Yok</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="mb-1 block text-sm text-gray-700">Renk</label>
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              placeholder="ör. Kırmızı"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            />
+          </div>
         </div>
 
         <button

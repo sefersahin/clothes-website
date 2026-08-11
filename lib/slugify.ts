@@ -24,8 +24,9 @@ function baseSlug(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function generateUniqueSlug(name: string): Promise<string> {
-  const slug = baseSlug(name) || "urun";
+export async function generateUniqueSlug(name: string, color?: string | null): Promise<string> {
+  const seed = color ? `${name} ${color}` : name;
+  const slug = baseSlug(seed) || "urun";
   const existing = await prisma.product.findUnique({ where: { slug } });
   if (!existing) return slug;
 

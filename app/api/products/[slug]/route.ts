@@ -7,7 +7,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
 
   const product = await prisma.product.findUnique({
     where: { slug },
-    include: { variants: true, images: { orderBy: { sortOrder: "asc" } }, category: true },
+    include: {
+      variants: true,
+      images: { orderBy: { sortOrder: "asc" } },
+      category: true,
+      group: { include: { products: { include: { images: { take: 1 } } } } },
+    },
   });
 
   if (!product || product.status === "draft") {

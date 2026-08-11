@@ -39,16 +39,28 @@ model Product {
   salePrice   Decimal?      @db.Decimal(10, 2)
   status      ProductStatus @default(draft)
   categoryId  String?
+  color       String?
+  groupId     String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
   category        Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  group           ProductGroup?    @relation(fields: [groupId], references: [id], onDelete: SetNull)
   variants        ProductVariant[]
   images          ProductImage[]
   sizeChartRows   SizeChartRow[]
   featuredProduct FeaturedProduct?
 
   @@map("products")
+}
+
+model ProductGroup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  products Product[]
+
+  @@map("product_groups")
 }
 
 model Category {
@@ -99,13 +111,12 @@ model ProductVariant {
   id            String  @id @default(cuid())
   productId     String
   size          String
-  color         String
   stockQuantity Int     @default(0)
   sku           String?
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, size, color])
+  @@unique([productId, size])
   @@map("product_variants")
 }
 

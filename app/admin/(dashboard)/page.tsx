@@ -52,7 +52,9 @@ export default async function AdminHomePage() {
                   href={`/admin/products/${variant.productId}`}
                   className="text-sm text-amber-600 hover:underline"
                 >
-                  {variant.product.name} - {variant.size} {variant.color} stokta yok
+                  {variant.product.name}
+                  {variant.product.color ? ` (${variant.product.color})` : ""} - {variant.size}{" "}
+                  stokta yok
                 </Link>
               </li>
             ))}

@@ -6,7 +6,6 @@ import { useState } from "react";
 type Variant = {
   id: string;
   size: string;
-  color: string;
   stockQuantity: number;
   sku: string | null;
 };
@@ -20,7 +19,6 @@ export default function VariantManager({
 }) {
   const router = useRouter();
   const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [stockEdits, setStockEdits] = useState<Record<string, string>>({});
@@ -34,16 +32,15 @@ export default function VariantManager({
     const res = await fetch(`/api/admin/products/${productId}/variants`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ size, color, stockQuantity: Number(stockQuantity) }),
+      body: JSON.stringify({ size, stockQuantity: Number(stockQuantity) }),
     });
 
     setBusy(false);
     if (!res.ok) {
-      setError("Beden/renk eklenemedi (aynı kombinasyon zaten var olabilir).");
+      setError("Beden eklenemedi (bu beden zaten var olabilir).");
       return;
     }
     setSize("");
-    setColor("");
     setStockQuantity("");
     router.refresh();
   }
@@ -70,13 +67,12 @@ export default function VariantManager({
 
   return (
     <div>
-      <h2 className="mb-3 text-sm font-medium text-gray-500">Beden / Renk / Stok</h2>
+      <h2 className="mb-3 text-sm font-medium text-gray-500">Beden / Stok</h2>
 
       <table className="mb-4 w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-200 text-gray-500">
             <th className="py-2 pr-4">Beden</th>
-            <th className="py-2 pr-4">Renk</th>
             <th className="py-2 pr-4">Stok</th>
             <th className="py-2 pr-4" />
           </tr>
@@ -85,7 +81,6 @@ export default function VariantManager({
           {variants.map((variant) => (
             <tr key={variant.id} className="border-b border-gray-100">
               <td className="py-2 pr-4">{variant.size}</td>
-              <td className="py-2 pr-4">{variant.color}</td>
               <td className="py-2 pr-4">
                 <input
                   type="number"
@@ -119,8 +114,8 @@ export default function VariantManager({
           ))}
           {variants.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-4 text-gray-500">
-                Henüz beden/renk eklenmedi.
+              <td colSpan={3} className="py-4 text-gray-500">
+                Henüz beden eklenmedi.
               </td>
             </tr>
           )}
@@ -136,16 +131,6 @@ export default function VariantManager({
             onChange={(e) => setSize(e.target.value)}
             required
             className="w-24 rounded border border-gray-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-gray-700">Renk</label>
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            required
-            className="w-28 rounded border border-gray-300 px-3 py-2 text-sm"
           />
         </div>
         <div>

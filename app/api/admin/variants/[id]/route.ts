@@ -6,7 +6,6 @@ import { requireAdmin } from "@/lib/auth";
 
 const patchSchema = z.object({
   size: z.string().min(1).optional(),
-  color: z.string().min(1).optional(),
   stockQuantity: z.number().int().min(0).optional(),
   sku: z.string().min(1).nullable().optional(),
 });
@@ -48,7 +47,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json(
-        { error: "A variant with this size/color already exists for this product" },
+        { error: "A variant with this size already exists for this product" },
         { status: 409 },
       );
     }

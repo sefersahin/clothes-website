@@ -59,7 +59,7 @@ export default function HeroCarousel({ slides }: { slides: Slide[] }) {
   if (count === 0) return null;
 
   return (
-    <div className="relative mb-12 overflow-hidden rounded-2xl">
+    <div className="relative mb-12 w-full overflow-hidden">
       <div
         ref={trackRef}
         className="flex touch-pan-y"

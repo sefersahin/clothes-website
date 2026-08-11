@@ -6,7 +6,6 @@ import { requireAdmin } from "@/lib/auth";
 
 const createSchema = z.object({
   size: z.string().min(1),
-  color: z.string().min(1),
   stockQuantity: z.number().int().min(0),
   sku: z.string().min(1).optional(),
 });
@@ -33,7 +32,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json(
-        { error: "A variant with this size/color already exists for this product" },
+        { error: "A variant with this size already exists for this product" },
         { status: 409 },
       );
     }

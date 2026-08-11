@@ -37,7 +37,7 @@ export default function ContactPage() {
 
   if (status === "sent") {
     return (
-      <div className="mx-auto max-w-lg text-center">
+      <div className="mx-auto max-w-lg px-4 py-10 text-center sm:px-6">
         <h1 className="mb-4 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
         <p className="text-sm text-stone-600">Mesajınız alındı, teşekkür ederiz.</p>
       </div>
@@ -45,7 +45,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg">
+    <div className="mx-auto max-w-lg px-4 py-10 sm:px-6">
       <h1 className="mb-3 text-3xl font-semibold tracking-tight text-stone-900">İletişim</h1>
       <p className="mb-8 text-sm leading-relaxed text-stone-600">{CONTACT_INTRO_MESSAGE}</p>
       <form onSubmit={handleSubmit} className="space-y-4">

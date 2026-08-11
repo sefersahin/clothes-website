@@ -30,30 +30,32 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="mb-12 flex flex-col items-center rounded-2xl bg-stone-50 px-6 py-12 text-center sm:py-16">
-        <div className="mb-4 h-40 w-40 overflow-hidden rounded-full sm:h-48 sm:w-48">
-          <Image
-            src={mainPageLogo}
-            alt="Hilay Butik"
-            className="h-full w-full object-cover"
-            priority
-          />
-        </div>
-        <p className="mx-auto max-w-md text-sm text-stone-500 sm:text-base">
-          Seçkin parçalar, uygun fiyatlar. Yeni sezon ürünlerimizi keşfedin.
-        </p>
-      </section>
-
       <HeroCarousel slides={heroSlides} />
 
-      {featuredProducts.length > 0 && (
-        <div className="mb-12">
-          <h2 className="mb-4 text-lg font-semibold text-stone-900">Öne Çıkanlar</h2>
-          <FeaturedCarousel products={featuredProducts} />
-        </div>
-      )}
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <section className="mb-12 flex flex-col items-center rounded-2xl bg-stone-50 px-6 py-12 text-center sm:py-16">
+          <div className="mb-4 h-40 w-40 overflow-hidden rounded-full sm:h-48 sm:w-48">
+            <Image
+              src={mainPageLogo}
+              alt="Hilay Butik"
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
+          <p className="mx-auto max-w-md text-sm text-stone-500 sm:text-base">
+            Seçkin parçalar, uygun fiyatlar. Yeni sezon ürünlerimizi keşfedin.
+          </p>
+        </section>
 
-      <ProductGrid products={products} />
+        {featuredProducts.length > 0 && (
+          <div className="mb-12">
+            <h2 className="mb-4 text-lg font-semibold text-stone-900">Öne Çıkanlar</h2>
+            <FeaturedCarousel products={featuredProducts} />
+          </div>
+        )}
+
+        <ProductGrid products={products} />
+      </div>
     </div>
   );
 }
